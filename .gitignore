@@ -1,0 +1,60 @@
+# --- Java ---
+*.class
+*.ctxt
+hs_err_pid*
+replay_pid*
+.mtj.tmp/
+
+# --- ビルド成果物 ---
+build/
+bin/
+target/
+out/
+*.war
+*.nar
+*.ear
+# Gradle wrapper の jar は各検証を単独で動かすためコミットする
+!gradle/wrapper/gradle-wrapper.jar
+
+# --- Gradle / Maven ---
+.gradle/
+gradle-app.setting
+.mvn/timing.properties
+
+# --- CDK ---
+cdk.out/
+# 参照した AZ やアカウント ID がキャッシュされるためコミットしない
+cdk.context.json
+
+# --- Node (フロントエンドを含む検証) ---
+node_modules/
+npm-debug.log*
+yarn-error.log*
+
+# --- テスト ---
+.jqwik-database
+
+# --- ログ ---
+*.log
+
+# --- IDE ---
+.idea/
+*.iml
+*.ipr
+*.iws
+.vscode/
+.project
+.classpath
+.settings/
+# .kiro/ 配下の spec / steering は設計ドキュメントとして残す
+.kiro/**/.DS_Store
+
+# --- OS ---
+.DS_Store
+Thumbs.db
+
+# --- ローカル設定・認証情報 ---
+.env
+.env.local
+*.pem
+*.p12

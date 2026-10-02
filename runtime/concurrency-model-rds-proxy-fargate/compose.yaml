@@ -1,0 +1,21 @@
+services:
+  mysql:
+    image: mysql:8.4
+    environment:
+      MYSQL_ROOT_PASSWORD: root
+      MYSQL_DATABASE: vtlab
+      MYSQL_USER: app
+      MYSQL_PASSWORD: app
+    ports:
+      # ホスト側は 3307。既存の MySQL が 3306 を使っていても衝突しないようにしている
+      # 127.0.0.1 だけで待ち受ける。パスワードが固定の弱い値なので、同じネットワークの他の機器から繋がらないようにする
+      - "127.0.0.1:3307:3306"
+    # 既定の max_connections は 151。プールサイズを大きくした条件を試すときに
+    # DB 側が先に上限になると計測したいものが見えなくなるため広げている
+    command:
+      - --max-connections=1000
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "127.0.0.1", "-uroot", "-proot"]
+      interval: 3s
+      timeout: 3s
+      retries: 20

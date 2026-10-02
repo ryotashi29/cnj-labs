@@ -1,0 +1,31 @@
+plugins {
+    id 'java'
+    id 'application'
+}
+
+group = 'com.ryotashi29'
+version = '0.0.1-SNAPSHOT'
+
+// 検証本体（common / mvc / webflux）とは別ビルドにしている。toolchain 21 を共有するだけで、
+// Spring Boot プラグインもテストの前提も共有しないため。
+// 本体の ./gradlew build に CDK の合成が混ざると、計測のためのビルドが CDK の都合で壊れる。
+//
+// toolchain が 21 なのは本体に合わせているだけで、pinned の対照群のような計測上の理由はない。
+java {
+    toolchain {
+        languageVersion = JavaLanguageVersion.of(21)
+    }
+}
+
+repositories {
+    mavenCentral()
+}
+
+dependencies {
+    implementation 'software.amazon.awscdk:aws-cdk-lib:2.244.0'
+    implementation 'software.constructs:constructs:10.5.1'
+}
+
+application {
+    mainClass = 'com.ryotashi29.cnj.runtime.concurrency.cdk.CdkApp'
+}

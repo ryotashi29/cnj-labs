@@ -1,0 +1,71 @@
+spring:
+  application:
+    name: concurrency-model-webflux
+  r2dbc:
+    # db / bounded 条件が使う。ローカルは compose.yaml の MySQL。
+    # sslMode は AWS で REQUIRED にする（RDS Proxy を TLS 必須にしているため）。
+    # ローカルの compose には証明書を置いていないので既定は DISABLED
+    url: ${R2DBC_URL:r2dbc:mysql://${DB_HOST:localhost}:${DB_PORT:3307}/${DB_NAME:vtlab}?sslMode=${DB_SSL_MODE:DISABLED}}
+    username: ${DB_USER:app}
+    password: ${DB_PASSWORD:app}
+    pool:
+      # 計測の主役。POOL_SIZE は下の HikariCP と同じ変数から引いており、
+      # 「接続数を揃えたままスタックだけ変える」ことを設定側で保証している
+      max-size: ${POOL_SIZE:10}
+      initial-size: ${POOL_SIZE:10}
+      # HikariCP の connection-timeout に対応する。同じ値にしないと
+      # 溢れたときの振る舞い（待つのか落ちるのか）が条件間でずれる
+      max-acquire-time: ${POOL_CONNECTION_TIMEOUT_MS:5000}ms
+  datasource:
+    # blocking 条件が使う。r2dbc とは別のプールだが、サイズは同じ POOL_SIZE で揃える。
+    # sslMode は r2dbc 側と同じ DB_SSL_MODE を読む（同じ DB へ同じ条件で繋ぐため）。
+    #
+    # SERVER_PREP_STMTS も mvc と同じ変数を読む。ただし効くのはこの JDBC 経路だけで、
+    # 上の r2dbc 経路には繋いでいない（r2dbc-mysql 側の同等の設定は
+    # useServerPrepareStatement で別物）。つまり webflux-r2dbc 条件では
+    # このスイッチは何もしない。黙って無効になると「ピニングが起きなかった」と
+    # 誤読するため、/api/diagnostics が経路ごとに実効値を申告する
+    url: ${DB_URL:jdbc:mysql://${DB_HOST:localhost}:${DB_PORT:3307}/${DB_NAME:vtlab}?sslMode=${DB_SSL_MODE:DISABLED}&allowPublicKeyRetrieval=true&useServerPrepStmts=${SERVER_PREP_STMTS:false}}
+    driverClassName: com.mysql.cj.jdbc.Driver
+    username: ${DB_USER:app}
+    password: ${DB_PASSWORD:app}
+    hikari:
+      pool-name: vtlab-blocking
+      maximum-pool-size: ${POOL_SIZE:10}
+      minimum-idle: ${POOL_SIZE:10}
+      connection-timeout: ${POOL_CONNECTION_TIMEOUT_MS:5000}
+
+workload:
+  # mvc 側の application.yml と同じ既定値。ずれると比較が成立しないため、変えるときは両方直す
+  default-hold-millis: ${WORKLOAD_DEFAULT_HOLD_MS:200}
+  max-hold-millis: ${WORKLOAD_MAX_HOLD_MS:5000}
+  # WebFlux にキャリアスレッドのピニングは存在せず /api/pinned もないため、この値は使われない。
+  # 共有の WorkloadProperties が要求するので既定だけ置いている
+  lock-stripes: ${WORKLOAD_LOCK_STRIPES:64}
+  permits: ${WORKLOAD_PERMITS:10}
+  acquire-timeout-millis: ${WORKLOAD_ACQUIRE_TIMEOUT_MS:200}
+
+starvation:
+  # 仮説 2 の対策のうち「観測」。CPU では見えない枯渇を、遅延として自分で申告する
+  enabled: ${STARVATION_METRICS_ENABLED:true}
+  # 負荷が 70 秒しかないので、秒より細かく見ないと立ち上がりが潰れる
+  probe-interval-millis: ${STARVATION_PROBE_INTERVAL_MS:250}
+  # EMF を stdout に吐く間隔。高解像度メトリクスなので 1 秒粒度まで問い合わせられる
+  publish-interval-millis: ${STARVATION_PUBLISH_INTERVAL_MS:5000}
+  namespace: ${METRICS_NAMESPACE:cnj/ConcurrencyModel}
+  # CloudWatch の次元。measure-aws.sh が条件名を渡すので、CpuUtilized と同じ軸で並べられる
+  condition: ${METRICS_CONDITION:unknown}
+  # WebFlux 側は仮想スレッドを使わないのでピニングは起きない。mvc と既定を揃えるために置くだけで、
+  # この値を読む実装はこちらには無い
+  pinned-threshold-millis: ${STARVATION_PINNED_THRESHOLD_MS:20}
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info,metrics,prometheus
+  metrics:
+    tags:
+      # Prometheus 側で条件ごとに系列を分けられるようにラベル化しておく
+      web_stack: webflux
+      pool_size: ${POOL_SIZE:10}

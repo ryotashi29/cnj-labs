@@ -1,0 +1,8 @@
+rootProject.name = 'concurrency-model-rds-proxy-fargate'
+
+// MVC と WebFlux を 1 つのアプリに同居させると、Boot がどちらのスタックで起動するかの判定
+// （spring.main.web-application-type）が絡んで条件の切り分けが曖昧になる。
+// 計測条件を疑う余地なく分けるため、別モジュール・別 jar にしている。
+include 'common'
+include 'mvc'
+include 'webflux'

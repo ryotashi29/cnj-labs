@@ -1,0 +1,21 @@
+{
+  "app": "./cdk-app.sh",
+  "watch": {
+    "include": [
+      "**"
+    ],
+    "exclude": [
+      "README.md",
+      "cdk*.json",
+      "**/.gradle/**",
+      "**/build/**",
+      "**/.git/**"
+    ]
+  },
+  "context": {
+    "@aws-cdk/core:checkSecretUsage": true,
+    "@aws-cdk/core:target-partitions": [
+      "aws"
+    ]
+  }
+}

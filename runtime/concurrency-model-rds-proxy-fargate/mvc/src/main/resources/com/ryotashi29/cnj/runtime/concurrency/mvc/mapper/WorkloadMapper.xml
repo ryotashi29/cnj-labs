@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.ryotashi29.cnj.runtime.concurrency.mvc.mapper.WorkloadMapper">
+
+    <select id="sleep" resultType="java.lang.Integer">
+        SELECT SLEEP(#{seconds})
+    </select>
+
+    <select id="backendConnectionId" resultType="java.lang.Long">
+        SELECT CONNECTION_ID()
+    </select>
+
+</mapper>

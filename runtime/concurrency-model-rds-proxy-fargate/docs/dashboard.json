@@ -1,0 +1,501 @@
+{
+  "widgets": [
+    {
+      "type": "text",
+      "x": 0,
+      "y": 0,
+      "width": 24,
+      "height": 2,
+      "properties": {
+        "markdown": "## 仮説 2：少数のスレッドをブロックすると、アプリ全体が応答しなくなる。しかも CPU 使用率には表れない\n計測 1b（2026-09-24、Fargate cpu256・コネクションプール 10・同時 30 リクエスト × 1 秒）。上段は左が問題のある実装、中央と右が対策後。**問題のある実装のほうが CPU 使用率が低い。**"
+      }
+    },
+    {
+      "type": "metric",
+      "x": 0,
+      "y": 2,
+      "width": 8,
+      "height": 7,
+      "properties": {
+        "title": "問題あり：mvc-virtual-jdk21（synchronized でピニングが発生）",
+        "region": "ap-northeast-1",
+        "view": "timeSeries",
+        "stacked": false,
+        "period": 60,
+        "start": "2026-09-24T14:07:30Z",
+        "end": "2026-09-24T14:11:30Z",
+        "metrics": [
+          [
+            "ECS/ContainerInsights",
+            "CpuUtilized",
+            "ClusterName",
+            "cnj-cm",
+            "TaskDefinitionFamily",
+            "cnj-cm-mvc-jdk21-cpu256",
+            {
+              "id": "cpu",
+              "visible": false,
+              "stat": "Maximum"
+            }
+          ],
+          [
+            {
+              "expression": "cpu * 100 / 256",
+              "label": "CPU 使用率（%）",
+              "id": "pct",
+              "yAxis": "left",
+              "color": "#1f77b4"
+            }
+          ],
+          [
+            "cnj/ConcurrencyModel",
+            "CarrierLagMillis",
+            "Condition",
+            "mvc-virtual-jdk21",
+            {
+              "label": "スレッドの空き待ち時間（ms）",
+              "stat": "Maximum",
+              "yAxis": "right",
+              "color": "#d62728"
+            }
+          ]
+        ],
+        "yAxis": {
+          "left": {
+            "min": 0,
+            "max": 100,
+            "label": "CPU %",
+            "showUnits": false
+          },
+          "right": {
+            "min": 0,
+            "label": "待ち時間 ms",
+            "showUnits": false,
+            "max": 30000
+          }
+        }
+      }
+    },
+    {
+      "type": "metric",
+      "x": 8,
+      "y": 2,
+      "width": 8,
+      "height": 7,
+      "properties": {
+        "title": "対策① コード修正：mvc-virtual-jdk21-lock（ReentrantLock に置き換え）",
+        "region": "ap-northeast-1",
+        "view": "timeSeries",
+        "stacked": false,
+        "period": 60,
+        "start": "2026-09-24T14:03:00Z",
+        "end": "2026-09-24T14:07:15Z",
+        "metrics": [
+          [
+            "ECS/ContainerInsights",
+            "CpuUtilized",
+            "ClusterName",
+            "cnj-cm",
+            "TaskDefinitionFamily",
+            "cnj-cm-mvc-jdk21-cpu256",
+            {
+              "id": "cpu",
+              "visible": false,
+              "stat": "Maximum"
+            }
+          ],
+          [
+            {
+              "expression": "cpu * 100 / 256",
+              "label": "CPU 使用率（%）",
+              "id": "pct",
+              "yAxis": "left",
+              "color": "#1f77b4"
+            }
+          ],
+          [
+            "cnj/ConcurrencyModel",
+            "CarrierLagMillis",
+            "Condition",
+            "mvc-virtual-jdk21-lock",
+            {
+              "label": "スレッドの空き待ち時間（ms）",
+              "stat": "Maximum",
+              "yAxis": "right",
+              "color": "#d62728"
+            }
+          ]
+        ],
+        "yAxis": {
+          "left": {
+            "min": 0,
+            "max": 100,
+            "label": "CPU %",
+            "showUnits": false
+          },
+          "right": {
+            "min": 0,
+            "label": "待ち時間 ms",
+            "showUnits": false,
+            "max": 30000
+          }
+        }
+      }
+    },
+    {
+      "type": "metric",
+      "x": 16,
+      "y": 2,
+      "width": 8,
+      "height": 7,
+      "properties": {
+        "title": "対策② JDK 更新：mvc-virtual（JDK 25、synchronized のまま）",
+        "region": "ap-northeast-1",
+        "view": "timeSeries",
+        "stacked": false,
+        "period": 60,
+        "start": "2026-09-24T14:12:00Z",
+        "end": "2026-09-24T14:16:00Z",
+        "metrics": [
+          [
+            "ECS/ContainerInsights",
+            "CpuUtilized",
+            "ClusterName",
+            "cnj-cm",
+            "TaskDefinitionFamily",
+            "cnj-cm-mvc-jdk25-cpu256",
+            {
+              "id": "cpu",
+              "visible": false,
+              "stat": "Maximum"
+            }
+          ],
+          [
+            {
+              "expression": "cpu * 100 / 256",
+              "label": "CPU 使用率（%）",
+              "id": "pct",
+              "yAxis": "left",
+              "color": "#1f77b4"
+            }
+          ],
+          [
+            "cnj/ConcurrencyModel",
+            "CarrierLagMillis",
+            "Condition",
+            "mvc-virtual",
+            {
+              "label": "スレッドの空き待ち時間（ms）",
+              "stat": "Maximum",
+              "yAxis": "right",
+              "color": "#d62728"
+            }
+          ]
+        ],
+        "yAxis": {
+          "left": {
+            "min": 0,
+            "max": 100,
+            "label": "CPU %",
+            "showUnits": false
+          },
+          "right": {
+            "min": 0,
+            "label": "待ち時間 ms",
+            "showUnits": false,
+            "max": 30000
+          }
+        }
+      }
+    },
+    {
+      "type": "metric",
+      "x": 0,
+      "y": 9,
+      "width": 12,
+      "height": 7,
+      "properties": {
+        "title": "問題あり：webflux-blocking（イベントループ上で JDBC を呼ぶ）",
+        "region": "ap-northeast-1",
+        "view": "timeSeries",
+        "stacked": false,
+        "period": 60,
+        "start": "2026-09-24T15:50:30Z",
+        "end": "2026-09-24T15:54:30Z",
+        "metrics": [
+          [
+            "ECS/ContainerInsights",
+            "CpuUtilized",
+            "ClusterName",
+            "cnj-cm",
+            "TaskDefinitionFamily",
+            "cnj-cm-webflux-jdk25-cpu256",
+            {
+              "id": "cpu",
+              "visible": false,
+              "stat": "Maximum"
+            }
+          ],
+          [
+            {
+              "expression": "cpu * 100 / 256",
+              "label": "CPU 使用率（%）",
+              "id": "pct",
+              "yAxis": "left",
+              "color": "#1f77b4"
+            }
+          ],
+          [
+            "cnj/ConcurrencyModel",
+            "EventLoopLagMillis",
+            "Condition",
+            "webflux-blocking",
+            {
+              "label": "スレッドの空き待ち時間（ms）",
+              "stat": "Maximum",
+              "yAxis": "right",
+              "color": "#d62728"
+            }
+          ]
+        ],
+        "yAxis": {
+          "left": {
+            "min": 0,
+            "max": 100,
+            "label": "CPU %",
+            "showUnits": false
+          },
+          "right": {
+            "min": 0,
+            "label": "待ち時間 ms",
+            "showUnits": false,
+            "max": 8000
+          }
+        }
+      }
+    },
+    {
+      "type": "metric",
+      "x": 12,
+      "y": 9,
+      "width": 12,
+      "height": 7,
+      "properties": {
+        "title": "対策：webflux-blocking-isolated（boundedElastic に処理を逃がす）",
+        "region": "ap-northeast-1",
+        "view": "timeSeries",
+        "stacked": false,
+        "period": 60,
+        "start": "2026-09-24T13:58:30Z",
+        "end": "2026-09-24T14:03:00Z",
+        "metrics": [
+          [
+            "ECS/ContainerInsights",
+            "CpuUtilized",
+            "ClusterName",
+            "cnj-cm",
+            "TaskDefinitionFamily",
+            "cnj-cm-webflux-jdk25-cpu256",
+            {
+              "id": "cpu",
+              "visible": false,
+              "stat": "Maximum"
+            }
+          ],
+          [
+            {
+              "expression": "cpu * 100 / 256",
+              "label": "CPU 使用率（%）",
+              "id": "pct",
+              "yAxis": "left",
+              "color": "#1f77b4"
+            }
+          ],
+          [
+            "cnj/ConcurrencyModel",
+            "EventLoopLagMillis",
+            "Condition",
+            "webflux-blocking-isolated",
+            {
+              "label": "スレッドの空き待ち時間（ms）",
+              "stat": "Maximum",
+              "yAxis": "right",
+              "color": "#d62728"
+            }
+          ]
+        ],
+        "yAxis": {
+          "left": {
+            "min": 0,
+            "max": 100,
+            "label": "CPU %",
+            "showUnits": false
+          },
+          "right": {
+            "min": 0,
+            "label": "待ち時間 ms",
+            "showUnits": false,
+            "max": 8000
+          }
+        }
+      }
+    },
+    {
+      "type": "metric",
+      "x": 0,
+      "y": 16,
+      "width": 24,
+      "height": 6,
+      "properties": {
+        "title": "ピニングの発生件数（起動から終了までの合計）：JDK 21 は約 130 件。ReentrantLock は起動直後の 2 件だけで負荷中は 0 件、JDK 25 は 0 件",
+        "region": "ap-northeast-1",
+        "view": "bar",
+        "stacked": false,
+        "period": 900,
+        "start": "2026-09-24T14:03:00Z",
+        "end": "2026-09-24T14:16:00Z",
+        "metrics": [
+          [
+            "cnj/ConcurrencyModel",
+            "PinnedEvents",
+            "Condition",
+            "mvc-virtual-jdk21",
+            {
+              "stat": "Sum",
+              "label": "mvc-virtual-jdk21"
+            }
+          ],
+          [
+            "cnj/ConcurrencyModel",
+            "PinnedEvents",
+            "Condition",
+            "mvc-virtual-jdk21-lock",
+            {
+              "stat": "Sum",
+              "label": "mvc-virtual-jdk21-lock"
+            }
+          ],
+          [
+            "cnj/ConcurrencyModel",
+            "PinnedEvents",
+            "Condition",
+            "mvc-virtual",
+            {
+              "stat": "Sum",
+              "label": "mvc-virtual（JDK 25）"
+            }
+          ]
+        ],
+        "setPeriodToTimeRange": true,
+        "yAxis": {
+          "left": {
+            "min": 0,
+            "showUnits": false
+          }
+        }
+      }
+    },
+    {
+      "type": "text",
+      "x": 0,
+      "y": 22,
+      "width": 24,
+      "height": 2,
+      "properties": {
+        "markdown": "## 仮説 1：スループットの上限はコネクションプールで決まる → 検証の結果、DB 内部の同時実行数も上限になると分かった\nmvc-virtual・プール 25・Aurora Serverless v2（2 ACU）。左は `SELECT SLEEP()`（DB 側のスレッドまで使う）、右は `tx-hold`（接続だけを保持し、アプリ側で待つ）。"
+      }
+    },
+    {
+      "type": "metric",
+      "x": 0,
+      "y": 24,
+      "width": 12,
+      "height": 6,
+      "properties": {
+        "title": "SLEEP：DB 内で実行中の SLEEP は最大 3〜4 本（2026-09-26）",
+        "region": "ap-northeast-1",
+        "view": "timeSeries",
+        "stacked": false,
+        "period": 60,
+        "start": "2026-09-25T17:14:00Z",
+        "end": "2026-09-25T17:23:00Z",
+        "metrics": [
+          [
+            "cnj/ConcurrencyModel",
+            "DbSleepingThreads",
+            "Condition",
+            "mvc-virtual",
+            {
+              "stat": "Maximum",
+              "label": "DB 内で実行中の SLEEP（本）"
+            }
+          ],
+          [
+            "cnj/ConcurrencyModel",
+            "BoundedPermitsAvailable",
+            "Condition",
+            "mvc-virtual",
+            {
+              "stat": "Minimum",
+              "label": "（参考）bounded の空き",
+              "visible": false
+            }
+          ]
+        ],
+        "yAxis": {
+          "left": {
+            "min": 0,
+            "max": 25,
+            "showUnits": false
+          }
+        }
+      }
+    },
+    {
+      "type": "metric",
+      "x": 12,
+      "y": 24,
+      "width": 12,
+      "height": 6,
+      "properties": {
+        "title": "tx-hold：DB 内で実行中の処理は 0 本（2026-09-27）",
+        "region": "ap-northeast-1",
+        "view": "timeSeries",
+        "stacked": false,
+        "period": 60,
+        "start": "2026-09-26T17:25:00Z",
+        "end": "2026-09-26T17:33:00Z",
+        "metrics": [
+          [
+            "cnj/ConcurrencyModel",
+            "DbSleepingThreads",
+            "Condition",
+            "mvc-virtual",
+            {
+              "stat": "Maximum",
+              "label": "DB 内で実行中の SLEEP（本）"
+            }
+          ],
+          [
+            "cnj/ConcurrencyModel",
+            "BoundedPermitsAvailable",
+            "Condition",
+            "mvc-virtual",
+            {
+              "stat": "Minimum",
+              "label": "（参考）bounded の空き",
+              "visible": false
+            }
+          ]
+        ],
+        "yAxis": {
+          "left": {
+            "min": 0,
+            "max": 25,
+            "showUnits": false
+          }
+        }
+      }
+    }
+  ]
+}

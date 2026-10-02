@@ -1,0 +1,38 @@
+plugins {
+    id 'org.springframework.boot' version '4.1.1' apply false
+    id 'io.spring.dependency-management' version '1.1.7' apply false
+}
+
+subprojects {
+    apply plugin: 'java'
+    apply plugin: 'io.spring.dependency-management'
+
+    group = 'com.ryotashi29'
+    version = '0.0.1-SNAPSHOT'
+
+    // toolchain は 21 に据え置く。pinned の対照群は「同じ jar を JDK 21 と JDK 25 で流して
+    // 症状が消えることを見せる」計測なので、バイトコードが 21 で動かなくなると成立しない。
+    // Spring Boot 4 のベースラインは Java 17 なので 21 でも要求を満たしている。
+    // 計測に使う JDK はここと無関係（実行時に選ぶ）
+    java {
+        toolchain {
+            languageVersion = JavaLanguageVersion.of(21)
+        }
+    }
+
+    repositories {
+        mavenCentral()
+    }
+
+    // common モジュールは Boot プラグインを適用しない（実行可能 jar にしない）ので、
+    // BOM をここで明示的に取り込んでバージョン管理を全モジュールで揃える
+    dependencyManagement {
+        imports {
+            mavenBom org.springframework.boot.gradle.plugin.SpringBootPlugin.BOM_COORDINATES
+        }
+    }
+
+    tasks.named('test') {
+        useJUnitPlatform()
+    }
+}

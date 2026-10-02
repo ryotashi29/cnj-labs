@@ -1,0 +1,15 @@
+// 条件 mvc-platform / mvc-virtual。切り替えは VIRTUAL_THREAD_ENABLED だけで、jar は共通。
+apply plugin: 'org.springframework.boot'
+
+dependencies {
+    implementation project(':common')
+    implementation 'org.springframework.boot:spring-boot-starter-web'
+    implementation 'org.springframework.boot:spring-boot-starter-actuator'
+    implementation 'io.micrometer:micrometer-registry-prometheus'
+    // Boot 4 に追従したのは 4.1.0 から（4.0 系以前は Boot 3.x 向け）
+    implementation 'org.mybatis.spring.boot:mybatis-spring-boot-starter:4.1.0'
+    runtimeOnly 'com.mysql:mysql-connector-j:9.1.0'
+
+    testImplementation 'org.springframework.boot:spring-boot-starter-test'
+    testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
+}

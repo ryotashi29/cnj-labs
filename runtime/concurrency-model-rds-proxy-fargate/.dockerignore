@@ -1,0 +1,14 @@
+# Docker のビルドコンテキストから外すもの。cdk/docker/*/Dockerfile の両方が使う。
+#
+# build/ を外すのが本質的に重要。手元の build/libs をコンテキストに含めると、
+# イメージの中で作った jar と手元の古い jar が混ざり、どちらを計測したのか曖昧になる
+# （最初のビルドでは cp が 2 つの jar に当たって失敗した）。
+.git
+.gradle
+*/.gradle
+build
+*/build
+cdk/build
+cdk/.gradle
+cdk/cdk.out
+k6/results

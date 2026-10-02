@@ -1,0 +1,84 @@
+spring:
+  application:
+    name: concurrency-model-mvc
+  datasource:
+    # ローカルは compose.yaml の MySQL。Aurora / RDS Proxy へ向けるときは DB_URL を丸ごと差し替える。
+    # sslMode は AWS で REQUIRED にする（RDS Proxy を TLS 必須にしているため）。
+    # ローカルの compose には証明書を置いていないので既定は DISABLED。
+    #
+    # SERVER_PREP_STMTS は RDS Proxy のセッションピニングを起こすためのスイッチ。true にすると
+    # Connector/J がサーバ側プリペアドステートメントを使い、プロキシは接続を多重化できなくなる。
+    # 既定の false を URL に明示しているのは、「指定しなかったから false」と「false を選んだ」を
+    # /api/diagnostics の申告から区別できるようにするため
+    url: ${DB_URL:jdbc:mysql://${DB_HOST:localhost}:${DB_PORT:3307}/${DB_NAME:vtlab}?sslMode=${DB_SSL_MODE:DISABLED}&allowPublicKeyRetrieval=true&useServerPrepStmts=${SERVER_PREP_STMTS:false}}
+    driverClassName: com.mysql.cj.jdbc.Driver
+    username: ${DB_USER:app}
+    password: ${DB_PASSWORD:app}
+    hikari:
+      pool-name: vtlab
+      # 計測の主役。この値と保持時間だけでスループット上限が決まることを確かめる
+      maximum-pool-size: ${POOL_SIZE:10}
+      minimum-idle: ${POOL_SIZE:10}
+      # 既定の 30 秒だと負荷試験で待たされ続けて計測が伸びるため、既定値より短くしている。
+      # 「接続待ちでタイムアウトする」ことの再現には十分で、試験の回転を上げられる
+      connection-timeout: ${POOL_CONNECTION_TIMEOUT_MS:5000}
+  threads:
+    virtual:
+      # この検証の唯一の切り替えスイッチ。true / false を揃えた条件で比較する
+      enabled: ${VIRTUAL_THREAD_ENABLED:false}
+
+server:
+  tomcat:
+    threads:
+      # 仮想スレッドを有効にするとこの値は効かなくなる（Tomcat が仮想スレッドの Executor に切り替わる）。
+      # 無効時の暗黙の同時実行制限がいくつだったかを明示するために置いている
+      max: ${TOMCAT_MAX_THREADS:200}
+
+workload:
+  default-hold-millis: ${WORKLOAD_DEFAULT_HOLD_MS:200}
+  max-hold-millis: ${WORKLOAD_MAX_HOLD_MS:5000}
+  lock-stripes: ${WORKLOAD_LOCK_STRIPES:64}
+  permits: ${WORKLOAD_PERMITS:10}
+  # 0 にすると完全な fail-fast（空きがなければ即 503）。既定は保持時間 1 回分ぶんだけ待つ設定にしている。
+  # 短い待ちを許すと瞬間的な山を吸収でき、それを超えた分だけを 503 として落とせる
+  acquire-timeout-millis: ${WORKLOAD_ACQUIRE_TIMEOUT_MS:200}
+
+starvation:
+  # 仮説 2 の対策のうち「観測」。CPU では見えない枯渇を、遅延として自分で申告する
+  enabled: ${STARVATION_METRICS_ENABLED:true}
+  # 負荷が 70 秒しかないので、秒より細かく見ないと立ち上がりが潰れる
+  probe-interval-millis: ${STARVATION_PROBE_INTERVAL_MS:250}
+  # EMF を stdout に吐く間隔。高解像度メトリクスなので 1 秒粒度まで問い合わせられる
+  publish-interval-millis: ${STARVATION_PUBLISH_INTERVAL_MS:5000}
+  namespace: ${METRICS_NAMESPACE:cnj/ConcurrencyModel}
+  # CloudWatch の次元。measure-aws.sh が条件名を渡すので、CpuUtilized と同じ軸で並べられる
+  condition: ${METRICS_CONDITION:unknown}
+  # ピニングを数える下限。JFR の既定と同じ 20 ms。これより短いピニングは実害がなく、
+  # 数えると件数だけが増えて「害のあるピニングが何回あったか」が読めなくなる
+  pinned-threshold-millis: ${STARVATION_PINNED_THRESHOLD_MS:20}
+
+db-observer:
+  # DB の中で SLEEP を実行している本数を数える。空なら観測しない（ローカルの既定）。
+  # measure-aws.sh が Aurora の writer を渡す。RDS Proxy を通さないのは、観測の経路を
+  # 観測対象（プロキシの多重化）から切り離すため
+  host: ${DB_OBSERVER_HOST:}
+  url: jdbc:mysql://${DB_OBSERVER_HOST:}:${DB_PORT:3307}/${DB_NAME:vtlab}?sslMode=${DB_SSL_MODE:DISABLED}&allowPublicKeyRetrieval=true
+  # 段は 30 秒あるので、0.5 秒ごとなら 1 段あたり 60 点取れる
+  interval-millis: ${DB_OBSERVER_INTERVAL_MS:500}
+
+mybatis:
+  configuration:
+    map-underscore-to-camel-case: true
+  mapper-locations: classpath*:/com/ryotashi29/cnj/runtime/concurrency/mvc/mapper/*.xml
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info,metrics,prometheus
+  metrics:
+    tags:
+      # Prometheus 側で条件ごとに系列を分けられるようにラベル化しておく
+      web_stack: mvc
+      virtual_thread: ${VIRTUAL_THREAD_ENABLED:false}
+      pool_size: ${POOL_SIZE:10}
