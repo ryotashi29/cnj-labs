@@ -3,7 +3,7 @@ package com.ryotashi29.cnj.runtime.concurrency.common.config;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 
 /**
- * 少数のスレッドの枯渇を観測するための調整値。仮説 2 の対策のうち「観測」に対応する。
+ * 数の限られたスレッド（キャリアスレッド・イベントループ）の枯渇を観測するための調整値。仮説 2 の対策のうち「観測」に対応する。
  *
  * <p>mvc / webflux で値がずれると条件間の比較が成立しないため、{@link WorkloadProperties} と
  * 同じ理由で共有モジュールに置いている。

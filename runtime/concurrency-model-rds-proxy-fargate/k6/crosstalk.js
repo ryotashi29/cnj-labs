@@ -1,7 +1,7 @@
 import http from 'k6/http';
 import { Counter, Trend } from 'k6/metrics';
 
-// 「少数のスレッドをブロックすると、無関係なリクエストまで巻き込まれる」ことを k6 で測る。
+// 「数の限られたスレッド（キャリアスレッド・イベントループ）をブロックすると、無関係なリクエストまで巻き込まれる」ことを k6 で測る。
 // crosstalk.sh の AWS 版。
 //
 // crosstalk.sh（curl + bc）を残しているのは、k6 のない環境でも検証の核を確認できるようにするため。

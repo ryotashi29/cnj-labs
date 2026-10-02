@@ -409,7 +409,7 @@ pinned_sessions_max() {
 # CloudWatch 側に出しているのは CpuUtilized と同じ画に重ねるためのもので、
 # 「その回のピークはいくらだったか」はログのほうが確実に揃う。
 #
-# 集計の仕方がメトリクスによって違う。遅れは瞬間値なので最大（max）、ピニングの件数は
+# 集計の仕方がメトリクスによって違う。スレッドの空き待ち時間は瞬間値なので最大（max）、ピニングの件数は
 # 送信間隔ごとの区間値なので合計（add）。ここを取り違えると、件数が「一番多かった 5 秒間」に
 # 縮んで見える。
 #
@@ -435,12 +435,12 @@ emf_metric() {
     fi
 }
 
-# アプリが出した DB_THREADS 行を「借りている接続の本数」ごとにまとめる。
+# アプリが出した DB_THREADS 行を「使用中の接続の本数」ごとにまとめる。
 #
-# 借りている本数（borrowed）と、DB の中で SLEEP を実行している本数（sleeping）は
+# 使用中の本数（borrowed）と、DB の中で SLEEP を実行している本数（sleeping）は
 # 同じ瞬間に取ってある。borrowed ごとに sleeping を並べると、差が DB の中の順番待ちになる。
 # 段（同時数）ごとではなく borrowed ごとに集めるのは、段の切れ目の時刻をこちらが知らないため。
-# 知りたいのは「何本借りているときに、何本走っていたか」なので、この軸で足りる。
+# 知りたいのは「何本使用中のときに、何本走っていたか」なので、この軸で足りる。
 #
 # 行が 1 つも無ければ、表ではなく n/a を返す（観測が動いていなかった。0 本ではない）
 db_threads_table() {
@@ -457,7 +457,7 @@ db_threads_table() {
         echo 'n/a'
         return 0
     fi
-    echo '| 借りている接続 | 標本数 | SLEEP 実行中（平均） | SLEEP 実行中（最大） | Threads_running（平均） |'
+    echo '| 使用中の接続 | 標本数 | SLEEP 実行中（平均） | SLEEP 実行中（最大） | Threads_running（平均） |'
     echo '|---|---|---|---|---|'
     printf '%s\n' "$rows" \
         | sed -E 's/[a-z_]+=//g' \
@@ -643,7 +643,7 @@ sweep() {
 
                     lag=$(emf_metric "$LAG_METRIC" "$APP_TASK" "$start_ms")
 
-                    # 遅れの原因側。件数は区間値なので合計、最長は最大で取る。
+                    # 空き待ち時間が延びた原因側。件数は区間値なので合計、最長は最大で取る。
                     # n/a は「JFR を購読していない」（webflux 条件、または購読に失敗）で、
                     # 0 件は「ピニングが起きなかった」。JDK 25 の条件で 0 件になるのは正しい結果
                     vt_pinned=$(emf_metric PinnedEvents "$APP_TASK" "$start_ms" add)
@@ -683,7 +683,7 @@ sweep() {
                     if [ "$SCRIPT" != crosstalk ]; then
                         db_threads_table "$APP_TASK" "$start_ms" > "$RESULTS_DIR/${label}.db-threads.md"
                         echo
-                        echo "    借りている接続と、DB の中で SLEEP を実行している本数（観測は writer 直結）:"
+                        echo "    使用中の接続と、DB の中で SLEEP を実行している本数（観測は writer 直結）:"
                         sed 's/^/    /' "$RESULTS_DIR/${label}.db-threads.md"
                     fi
 

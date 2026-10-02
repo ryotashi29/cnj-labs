@@ -57,10 +57,10 @@ public class DiagnosticsController {
         result.put("boundedPermitsAvailable", databaseWorkload.availablePermits());
         // キャリアスレッドがブロックされていれば lagMillis が伸びる。CPU では見えない枯渇の申告
         starvationProbe.ifAvailable(probe -> result.put("starvation", probe.snapshot()));
-        // 遅れの原因側。available が false のときの 0 件は「観測していない」の意味なので、
+        // スレッドの空き待ち時間が延びた原因側。available が false のときの 0 件は「観測していない」の意味なので、
         // 件数だけでなく購読の状態も申告させる
         pinnedEventRecorder.ifAvailable(recorder -> result.put("pinning", recorder.snapshot()));
-        // 借りている接続の本数と、DB の中で SLEEP を実行している本数。差が DB の中の順番待ち
+        // 使用中の接続の本数と、DB の中で SLEEP を実行している本数。差が DB の中の順番待ち
         databaseThreadObserver.ifAvailable(observer -> result.put("databaseThreads", observer.snapshot()));
         result.put("memory", JvmDiagnostics.memory());
         return result;

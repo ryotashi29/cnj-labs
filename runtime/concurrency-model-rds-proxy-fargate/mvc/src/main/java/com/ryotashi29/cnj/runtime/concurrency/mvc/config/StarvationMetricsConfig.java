@@ -55,9 +55,9 @@ public class StarvationMetricsConfig {
     }
 
     /**
-     * ピニングそのものを数える。{@link StarvationProbe} が測る遅れの<b>原因側</b>。
+     * ピニングそのものを数える。{@link StarvationProbe} が測るスレッドの空き待ち時間の<b>原因側</b>。
      *
-     * <p>遅れだけでは「詰まった」ことしか言えない。ここを足すと、詰まりの原因が
+     * <p>空き待ち時間だけでは「詰まった」ことしか言えない。ここを足すと、詰まりの原因が
      * キャリアスレッドを離せないことだったと<b>推測ではなく数値で</b>言える。
      * 購読に失敗しても計測は続けたいので、{@code start()} の戻り値は
      * 送信側で見て、駄目なときはメトリクスを出さない（0 件と混同させない）。
@@ -73,9 +73,9 @@ public class StarvationMetricsConfig {
      * DB の中で SLEEP を実行している本数を数える。{@code DB_OBSERVER_HOST} を渡したときだけ動く。
      *
      * <p>プールを増やしても Proxy を外しても上限が 約 20 rps で動かなかった。
-     * アプリが借りている本数と、DB の中で実際に走っている本数を並べて、
+     * アプリが使用中の本数と、DB の中で実際に走っている本数を並べて、
      * <b>接続は足りているのに DB の中で順番待ちしている</b>のかを確かめる。
-     * 借りている本数は HikariCP の activeConnections。プールが起動する前は 0 を返す。
+     * 使用中の本数は HikariCP の activeConnections。プールが起動する前は 0 を返す。
      */
     @Bean(destroyMethod = "close")
     @ConditionalOnExpression("!'${db-observer.host:}'.isEmpty()")

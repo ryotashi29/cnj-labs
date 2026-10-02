@@ -11,7 +11,7 @@ import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
 
 /**
- * 少数のスレッドがブロックされていることを、CPU ではなく<b>遅延</b>で測る。仮説 2 の対策のうち「観測」。
+ * 数の限られたスレッド（キャリアスレッド・イベントループ）がブロックされていることを、CPU ではなく<b>スレッドの空き待ち時間</b>で測る。仮説 2 の対策のうち「観測」。
  *
  * <p>やっていることは単純で、監視対象の executor に何もしないタスクを投げ、
  * <b>投げてから走り出すまでの時間</b>を測る。イベントループやキャリアスレッドがブロックされていれば、
@@ -62,7 +62,7 @@ public final class StarvationProbe implements AutoCloseable {
         watcher.scheduleAtFixedRate(this::tick, 0, intervalMillis, TimeUnit.MILLISECONDS);
     }
 
-    /** 監視対象のうち最も遅れているものの、いまの遅れ。 */
+    /** 監視対象のうち最も長く待たされているものの、いまの空き待ち時間。 */
     public long lagMillis() {
         long now = System.nanoTime();
         long max = 0;
@@ -73,7 +73,7 @@ public final class StarvationProbe implements AutoCloseable {
     }
 
     /**
-     * 前回呼ばれてから観測した遅れの最大値を返し、高水位をリセットする。
+     * 前回呼ばれてから観測した空き待ち時間の最大値を返し、高水位をリセットする。
      *
      * <p>メトリクスの送信間隔（数秒）より監視の間隔（数百ミリ秒）のほうが短いので、
      * 送信時点の瞬間値だけを送ると山を取り逃す。送信側はこちらを使う。
@@ -170,7 +170,7 @@ public final class StarvationProbe implements AutoCloseable {
         }
 
         private long lagMillis(long nowNanos) {
-            // 未完了なら「まだ走っていない時間」が遅れの下限。完了済みなら測れた値
+            // 未完了なら「まだ走っていない時間」が空き待ち時間の下限。完了済みなら測れた値
             long nanos = pending ? nowNanos - submittedAtNanos : lastLagNanos;
             return Math.max(0, nanos) / NANOS_PER_MILLI;
         }

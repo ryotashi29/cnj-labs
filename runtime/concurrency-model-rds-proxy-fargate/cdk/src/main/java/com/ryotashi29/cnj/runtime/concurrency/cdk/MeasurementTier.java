@@ -76,7 +76,7 @@ public class MeasurementTier extends Construct {
     /**
      * ヒープと GC を固定する。タスクサイズを変えると {@code MaxRAMPercentage} 由来のヒープも動くため、
      * 固定しないと「タスクサイズを変えた結果」に「ヒープが変わった結果」が混ざる。
-     * 測りたいのは CPU 側（{@code availableProcessors} と少数のスレッドの本数）だけ。
+     * 測りたいのは CPU 側（{@code availableProcessors} とキャリアスレッド・イベントループの本数）だけ。
      *
      * <p>GC を明示するのは同じ理由。JVM の ergonomics は「2 CPU 以上かつ 2 GB 以上」で
      * G1 を選ぶため、{@code cpu256}（{@code availableProcessors} が 1）だけ Serial GC になる。

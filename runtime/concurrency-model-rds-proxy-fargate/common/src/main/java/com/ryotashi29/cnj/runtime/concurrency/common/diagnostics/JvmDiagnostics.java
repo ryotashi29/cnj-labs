@@ -48,7 +48,7 @@ public final class JvmDiagnostics {
      * 名前が接頭辞に一致する生存スレッド数。
      *
      * <p>イベントループ（{@code reactor-http-nio-}）やキャリアスレッド（{@code ForkJoinPool}）が
-     * 実際に何本立っているかを見るために使う。仮説 2 の「少数のスレッドの本数が上限を決める」は
+     * 実際に何本立っているかを見るために使う。仮説 2 の「数の限られたスレッドの本数が上限を決める」は
      * この値が {@code availableProcessors()} に連動することが前提なので、推測せず実測する。
      */
     public static long countThreads(String namePrefix) {

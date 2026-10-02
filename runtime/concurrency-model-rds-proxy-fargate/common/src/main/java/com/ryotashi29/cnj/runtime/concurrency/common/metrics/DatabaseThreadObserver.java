@@ -15,8 +15,8 @@ import java.util.function.IntSupplier;
 /**
  * DB の中で、いま本当に {@code SLEEP()} を実行している接続が何本あるかを数える。
  *
- * <p>アプリ側から見えるのは「接続を何本借りているか」まで。借りた接続の上で SQL が
- * <b>DB の中で実際に走り出しているか</b>は、アプリからは見えない。借りている本数と
+ * <p>アプリ側から見えるのは「接続を何本使用しているか」まで。使用中の接続の上で SQL が
+ * <b>DB の中で実際に走り出しているか</b>は、アプリからは見えない。使用中の本数と
  * 走っている本数を同じ瞬間に並べると、両者の差が「DB の中で順番待ちしている本数」になる。
  *
  * <p>数えるのは {@code information_schema.PROCESSLIST} のうち、{@code INFO} が
@@ -57,7 +57,7 @@ public final class DatabaseThreadObserver implements AutoCloseable {
     /**
      * 1 回ぶんの観測値。同じ瞬間に取った 4 つを 1 組で扱う。
      *
-     * @param borrowed アプリが借りている接続の本数
+     * @param borrowed アプリが使用中の接続の本数
      * @param sleeping DB の中で SLEEP を実行している本数
      * @param active   DB の中で何か実行している本数（SLEEP 以外も含む）
      * @param running  {@code Threads_running}。観測用の接続自身も 1 本含む
@@ -73,7 +73,7 @@ public final class DatabaseThreadObserver implements AutoCloseable {
 
     /**
      * @param jdbcUrl             観測用の接続先。アプリのプールとは別に 1 本だけ張る
-     * @param borrowedConnections アプリが借りている接続の本数を返す。HikariCP なら activeConnections
+     * @param borrowedConnections アプリが使用中の接続の本数を返す。HikariCP なら activeConnections
      * @param intervalMillis      観測の間隔
      */
     public DatabaseThreadObserver(String jdbcUrl, String user, String password,

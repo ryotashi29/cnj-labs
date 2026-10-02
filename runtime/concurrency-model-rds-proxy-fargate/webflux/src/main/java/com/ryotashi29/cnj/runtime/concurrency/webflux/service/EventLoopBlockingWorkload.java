@@ -13,7 +13,7 @@ import reactor.core.scheduler.Schedulers;
  * <p>仮説 2 の中心。仮想スレッドのピニングと構造的に同じ失敗を、WebFlux で再現する。
  *
  * <table>
- *   <caption>ブロックされる「少数のスレッド」</caption>
+ *   <caption>ブロックされる「数の限られたスレッド」</caption>
  *   <tr><th>モデル</th><th>ブロックされるもの</th><th>本数</th></tr>
  *   <tr><td>Virtual Thread + synchronized</td><td>キャリアスレッド</td>
  *       <td>{@code jdk.virtualThreadScheduler.parallelism}（既定 = コア数）</td></tr>

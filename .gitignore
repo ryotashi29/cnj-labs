@@ -58,3 +58,6 @@ Thumbs.db
 .env.local
 *.pem
 *.p12
+
+# Python のキャッシュ
+__pycache__/

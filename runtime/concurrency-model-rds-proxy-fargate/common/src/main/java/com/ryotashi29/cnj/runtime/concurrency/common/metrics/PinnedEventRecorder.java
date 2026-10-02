@@ -10,7 +10,7 @@ import jdk.jfr.consumer.RecordingStream;
 /**
  * 仮想スレッドのピニングを JFR の {@code jdk.VirtualThreadPinned} イベントとして数える。
  *
- * <p>{@link StarvationProbe} が測るのはブロックの<b>結果</b>（走り出すまでの遅れ）で、
+ * <p>{@link StarvationProbe} が測るのはブロックの<b>結果</b>（走り出すまでの空き待ち時間）で、
  * こちらが数えるのは<b>原因</b>（キャリアスレッドを離せないままブロックしたこと）。
  * 2 つを同じ名前空間に出すと、CloudWatch 上で原因と結果を同じ時間軸に重ねられる。
  *

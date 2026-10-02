@@ -3,7 +3,7 @@
 入力は k6/results/raw-logs/ に書き出した生データ（CloudWatch Logs は 7 日で消えるため手元に退避したもの）。
 git には入れていないので、この図を描き直せるのはデータを持っている手元だけ。
 
-  claim2-cpu-inversion.png  仮説 2: 問題のある実装だけ CPU 使用率が低く、待ち時間が跳ね上がる（計測 1b）
+  claim2-cpu-inversion.png  仮説 2: 問題のある実装だけ CPU 使用率が低く、待ち時間が跳ね上がる（計測 2-2）
   claim1-session-pinning.png  仮説 1: useServerPrepStmts を有効にすると、アプリの接続がすべてピニングされる
   claim1-db-threads.png     仮説 1: 接続は足りているのに DB の中で順番待ちしている（#18 の観測）
 
@@ -71,17 +71,19 @@ def load_window(end_jst):
 
 
 def claim2():
-    # 成功数は 70 秒の負荷区間の値（README 計測 1b）。遅れの最大は EMF のピーク
+    # 処理件数は負荷中の毎秒の件数（k6 のログを 1 秒ごとに見た値。README 計測 2-2）。
+    # 成功数 ÷ 70 秒にしないのは、成功数に負荷を止めた後の猶予（gracefulStop）に返った分が入るため。
+    # 問題ありは前半が毎秒 1 件、後半が毎秒 2 件。スレッドの空き待ち時間の最大は EMF のピーク
     conditions = [
-        # 表示名, 色, タスク定義, ログの書き終わり（JST）, 成功数, 遅れの最大 ms
-        ("問題あり\nJDK 21 + synchronized", BROKEN, "cnj-cm-mvc-jdk21-cpu256", "2026-09-24T23:11:27", 130, 29750),
-        ("対策① コード修正\nJDK 21 + ReentrantLock", FIX_CODE, "cnj-cm-mvc-jdk21-cpu256", "2026-09-24T23:07:14", 2096, 0),
-        ("対策② JDK 更新\nJDK 25 + synchronized", FIX_JDK, "cnj-cm-mvc-jdk25-cpu256", "2026-09-24T23:15:56", 2100, 0),
+        # 表示名, 色, タスク定義, ログの書き終わり（JST）, 毎秒の処理件数（最小, 最大）, スレッドの空き待ち時間の最大 ms
+        ("問題あり\nJDK 21 + synchronized", BROKEN, "cnj-cm-mvc-jdk21-cpu256", "2026-09-24T23:11:27", (1, 2), 29750),
+        ("対策① コード修正\nJDK 21 + ReentrantLock", FIX_CODE, "cnj-cm-mvc-jdk21-cpu256", "2026-09-24T23:07:14", (30, 30), 0),
+        ("対策② JDK 更新\nJDK 25 + synchronized", FIX_JDK, "cnj-cm-mvc-jdk25-cpu256", "2026-09-24T23:15:56", (30, 30), 0),
     ]
     rows = []
-    for name, color, family, end, successes, lag_ms in conditions:
+    for name, color, family, end, rps, lag_ms in conditions:
         lo, hi = cpu_range(family, *load_window(end))
-        rows.append((name, color, successes / 70, lo, hi, lag_ms / 1000))
+        rows.append((name, color, rps, lo, hi, lag_ms / 1000))
 
     fig, axes = plt.subplots(1, 3, figsize=(12.5, 3.9), sharey=True,
                              gridspec_kw={"wspace": 0.12})
@@ -89,7 +91,8 @@ def claim2():
     bar_h = 0.56
 
     panels = [
-        ("処理できた件数（rps）", lambda r: (0, r[2]), 36, lambda r: f"{r[2]:.1f}"),
+        ("処理できた件数（rps、負荷中）", lambda r: (0, r[2][1]), 36,
+         lambda r: f"{r[2][0]}〜{r[2][1]}" if r[2][0] != r[2][1] else f"約 {r[2][0]}"),
         ("CPU 使用率（%、負荷中）", lambda r: (r[3], r[4]), 100, lambda r: f"{r[3]:.0f}〜{r[4]:.0f}%"),
         ("スレッドの空き待ち時間の最大（秒）", lambda r: (0, r[5]), 36, lambda r: f"{r[5]:.1f}" if r[5] else "0"),
     ]
@@ -111,8 +114,8 @@ def claim2():
     fig.suptitle("問題のある実装だけ、処理件数が落ち、CPU 使用率が下がり、待ち時間が跳ね上がる", x=0.01, ha="left",
                  fontsize=14, color=INK, y=1.04)
     fig.text(0.01, -0.06,
-             "AWS Fargate cpu256（キャリアスレッド 1 本）・同時 30 リクエスト × 1 秒・70 秒間。"
-             "CPU は Container Insights の 1 分値で、負荷にかかる 2 点の範囲。計測 1b",
+             "AWS Fargate cpu256（キャリアスレッド 1〜2 本）・同時 30 リクエスト × 1 秒・70 秒間。"
+             "CPU は Container Insights の 1 分値で、負荷にかかる 2 点の範囲。計測 2-2",
              fontsize=9, color=INK_2, ha="left")
     fig.savefig(HERE / "claim2-cpu-inversion.png", dpi=200, bbox_inches="tight")
     plt.close(fig)
@@ -137,7 +140,7 @@ def db_threads(filename, start_utc=None, end_utc=None):
         fields = dict(part.split("=") for part in event["m"].split()[1:])
         points.append((t, int(fields["borrowed"]), max(int(fields["active"]) - 1, 0)))
     points.sort()
-    # k6 は本計測の前に 10 同時のウォームアップを流す。借りた本数が一度 0 に戻るまでを
+    # k6 は本計測の前に 10 同時のウォームアップを流す。使用中の本数が一度 0 に戻るまでを
     # ウォームアップとして落とし、本計測（同時 1 の段）の 3 秒前を 0 秒にする
     i = next(i for i, p in enumerate(points) if p[1] > 0)
     i = next(j for j in range(i, len(points)) if points[j][1] == 0)

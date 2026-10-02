@@ -19,7 +19,7 @@ import org.springframework.web.bind.annotation.RestController;
 /**
  * 計測条件を実行中のプロセス自身に申告させるエンドポイント。mvc 側と対になる。
  *
- * <p>仮説 2 は「少数のスレッドの本数が上限を決める」であり、WebFlux でのその本数は
+ * <p>仮説 2 は「数の限られたスレッドの本数が上限を決める」であり、WebFlux でのその本数は
  * イベントループスレッド数。{@code reactor.netty.ioWorkerCount} を明示していなければ
  * {@code max(4, availableProcessors())} が既定になるため、設定値と実際に立っている本数の
  * 両方を返す。Fargate の 0.25 vCPU で本当に本数が絞られるのかを、推測ではなく実測で押さえる。
