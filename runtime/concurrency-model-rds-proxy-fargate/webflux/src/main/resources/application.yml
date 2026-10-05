@@ -4,7 +4,7 @@ spring:
   r2dbc:
     # db / bounded 条件が使う。ローカルは compose.yaml の MySQL。
     # sslMode は AWS で REQUIRED にする（RDS Proxy を TLS 必須にしているため）。
-    # ローカルの compose には証明書を置いていないので既定は DISABLED
+    # ローカルの compose には証明書を置いていないのでデフォルトは DISABLED
     url: ${R2DBC_URL:r2dbc:mysql://${DB_HOST:localhost}:${DB_PORT:3307}/${DB_NAME:vtlab}?sslMode=${DB_SSL_MODE:DISABLED}}
     username: ${DB_USER:app}
     password: ${DB_PASSWORD:app}
@@ -36,11 +36,11 @@ spring:
       connection-timeout: ${POOL_CONNECTION_TIMEOUT_MS:5000}
 
 workload:
-  # mvc 側の application.yml と同じ既定値。ずれると比較が成立しないため、変えるときは両方直す
+  # mvc 側の application.yml と同じデフォルト値。ずれると比較が成立しないため、変えるときは両方直す
   default-hold-millis: ${WORKLOAD_DEFAULT_HOLD_MS:200}
   max-hold-millis: ${WORKLOAD_MAX_HOLD_MS:5000}
   # WebFlux にキャリアスレッドのピニングは存在せず /api/pinned もないため、この値は使われない。
-  # 共有の WorkloadProperties が要求するので既定だけ置いている
+  # 共有の WorkloadProperties が要求するのでデフォルトだけ置いている
   lock-stripes: ${WORKLOAD_LOCK_STRIPES:64}
   permits: ${WORKLOAD_PERMITS:10}
   acquire-timeout-millis: ${WORKLOAD_ACQUIRE_TIMEOUT_MS:200}
@@ -55,7 +55,7 @@ starvation:
   namespace: ${METRICS_NAMESPACE:cnj/ConcurrencyModel}
   # CloudWatch の次元。measure-aws.sh が条件名を渡すので、CpuUtilized と同じ軸で並べられる
   condition: ${METRICS_CONDITION:unknown}
-  # WebFlux 側は仮想スレッドを使わないのでピニングは起きない。mvc と既定を揃えるために置くだけで、
+  # WebFlux 側は仮想スレッドを使わないのでピニングは起きない。mvc とデフォルトを揃えるために置くだけで、
   # この値を読む実装はこちらには無い
   pinned-threshold-millis: ${STARVATION_PINNED_THRESHOLD_MS:20}
 

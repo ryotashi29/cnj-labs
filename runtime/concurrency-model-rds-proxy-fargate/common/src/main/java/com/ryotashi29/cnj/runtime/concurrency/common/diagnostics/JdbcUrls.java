@@ -12,7 +12,7 @@ import java.util.regex.Pattern;
 public final class JdbcUrls {
 
     /**
-     * Connector/J の既定は {@code false} なので、URL に現れていなければ無効と読む。
+     * Connector/J のデフォルトは {@code false} なので、URL に現れていなければ無効と読む。
      * 値の大小文字は Connector/J が区別しないため、こちらも区別しない。
      */
     private static final Pattern SERVER_PREP_STMTS =

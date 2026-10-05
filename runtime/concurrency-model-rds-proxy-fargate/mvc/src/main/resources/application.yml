@@ -4,11 +4,11 @@ spring:
   datasource:
     # ローカルは compose.yaml の MySQL。Aurora / RDS Proxy へ向けるときは DB_URL を丸ごと差し替える。
     # sslMode は AWS で REQUIRED にする（RDS Proxy を TLS 必須にしているため）。
-    # ローカルの compose には証明書を置いていないので既定は DISABLED。
+    # ローカルの compose には証明書を置いていないのでデフォルトは DISABLED。
     #
     # SERVER_PREP_STMTS は RDS Proxy のセッションピニングを起こすためのスイッチ。true にすると
     # Connector/J がサーバ側プリペアドステートメントを使い、プロキシは接続を多重化できなくなる。
-    # 既定の false を URL に明示しているのは、「指定しなかったから false」と「false を選んだ」を
+    # デフォルトの false を URL に明示しているのは、「指定しなかったから false」と「false を選んだ」を
     # /api/diagnostics の申告から区別できるようにするため
     url: ${DB_URL:jdbc:mysql://${DB_HOST:localhost}:${DB_PORT:3307}/${DB_NAME:vtlab}?sslMode=${DB_SSL_MODE:DISABLED}&allowPublicKeyRetrieval=true&useServerPrepStmts=${SERVER_PREP_STMTS:false}}
     driverClassName: com.mysql.cj.jdbc.Driver
@@ -19,7 +19,7 @@ spring:
       # 計測の主役。この値と保持時間だけでスループット上限が決まることを確かめる
       maximum-pool-size: ${POOL_SIZE:10}
       minimum-idle: ${POOL_SIZE:10}
-      # 既定の 30 秒だと負荷試験で待たされ続けて計測が伸びるため、既定値より短くしている。
+      # デフォルトの 30 秒だと負荷試験で待たされ続けて計測が伸びるため、デフォルト値より短くしている。
       # 「接続待ちでタイムアウトする」ことの再現には十分で、試験の回転を上げられる
       connection-timeout: ${POOL_CONNECTION_TIMEOUT_MS:5000}
   threads:
@@ -39,7 +39,7 @@ workload:
   max-hold-millis: ${WORKLOAD_MAX_HOLD_MS:5000}
   lock-stripes: ${WORKLOAD_LOCK_STRIPES:64}
   permits: ${WORKLOAD_PERMITS:10}
-  # 0 にすると完全な fail-fast（空きがなければ即 503）。既定は保持時間 1 回分ぶんだけ待つ設定にしている。
+  # 0 にすると完全な fail-fast（空きがなければ即 503）。デフォルトは保持時間 1 回分ぶんだけ待つ設定にしている。
   # 短い待ちを許すと瞬間的な山を吸収でき、それを超えた分だけを 503 として落とせる
   acquire-timeout-millis: ${WORKLOAD_ACQUIRE_TIMEOUT_MS:200}
 
@@ -53,12 +53,12 @@ starvation:
   namespace: ${METRICS_NAMESPACE:cnj/ConcurrencyModel}
   # CloudWatch の次元。measure-aws.sh が条件名を渡すので、CpuUtilized と同じ軸で並べられる
   condition: ${METRICS_CONDITION:unknown}
-  # ピニングを数える下限。JFR の既定と同じ 20 ms。これより短いピニングは実害がなく、
+  # ピニングを数える下限。JFR のデフォルトと同じ 20 ms。これより短いピニングは実害がなく、
   # 数えると件数だけが増えて「害のあるピニングが何回あったか」が読めなくなる
   pinned-threshold-millis: ${STARVATION_PINNED_THRESHOLD_MS:20}
 
 db-observer:
-  # DB の中で SLEEP を実行している本数を数える。空なら観測しない（ローカルの既定）。
+  # DB の中で SLEEP を実行している本数を数える。空なら観測しない（ローカルのデフォルト）。
   # measure-aws.sh が Aurora の writer を渡す。RDS Proxy を通さないのは、観測の経路を
   # 観測対象（プロキシの多重化）から切り離すため
   host: ${DB_OBSERVER_HOST:}

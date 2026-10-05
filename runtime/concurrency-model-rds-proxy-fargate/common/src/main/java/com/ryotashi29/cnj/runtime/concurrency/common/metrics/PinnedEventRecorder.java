@@ -24,7 +24,7 @@ import jdk.jfr.consumer.RecordingStream;
  * 「観測できていない」ではない</b>ため、両者を区別できるよう {@link #available()} を分けている。
  *
  * <p>粒度の制約が 1 つある。JFR はイベントをバッファに溜めてから流すので、
- * <b>発生から購読までに最大 1 秒ずれる</b>。送信間隔（既定 5 秒）より短いので集計値は合うが、
+ * <b>発生から購読までに最大 1 秒ずれる</b>。送信間隔（デフォルト 5 秒）より短いので集計値は合うが、
  * 山の立ち上がりを 1 秒未満で読もうとしてはいけない。
  */
 public final class PinnedEventRecorder implements AutoCloseable {
@@ -39,7 +39,7 @@ public final class PinnedEventRecorder implements AutoCloseable {
     private volatile String status = "未開始";
 
     /**
-     * @param thresholdMillis この時間より短いピニングは数えない。JFR の既定と同じ 20 ms を想定。
+     * @param thresholdMillis この時間より短いピニングは数えない。JFR のデフォルトと同じ 20 ms を想定。
      *                        0 にすると極短時間のピニングまで拾って件数が意味を失うので、
      *                        「害のある長さ」に合わせて設定する
      */

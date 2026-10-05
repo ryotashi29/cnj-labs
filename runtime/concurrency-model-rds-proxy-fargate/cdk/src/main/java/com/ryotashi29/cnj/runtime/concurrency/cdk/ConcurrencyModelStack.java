@@ -31,13 +31,13 @@ import software.constructs.Construct;
 public class ConcurrencyModelStack extends Stack {
 
     /**
-     * タスクを public サブネットにパブリック IP 付きで置くか。既定は置かない。
+     * タスクを public サブネットにパブリック IP 付きで置くか。デフォルトは置かない。
      *
      * <p>置かない方が NAT ゲートウェイのぶん高いが（1 台で $0.06/h 前後）、
      * 「Fargate タスクにパブリック IP が付いている」はセキュリティ統制がまず指摘する構成で、
      * 「セキュリティグループで閉じているから到達できない」という説明は自動チェックには通らない。
      * 計測結果は経路に依存しない（アプリと k6 の通信も DB への通信も VPC 内で完結する）ので、
-     * 指摘されない側を既定にしている。安く済ませたいときだけ
+     * 指摘されない側をデフォルトにしている。安く済ませたいときだけ
      * {@code cdk deploy -c publicTasks=true} で戻す。
      */
     private static final String PUBLIC_TASKS_CONTEXT = "publicTasks";
@@ -91,7 +91,7 @@ public class ConcurrencyModelStack extends Stack {
         // 外向きを開けっ放しにしない。タスクが本当に必要なのは
         // ECR / S3 / CloudWatch Logs / Secrets Manager への 443 と、名前解決の 53 だけ。
         //
-        // disableInlineRules は必須。CDK は既定でルールをセキュリティグループ本体の
+        // disableInlineRules は必須。CDK はデフォルトでルールをセキュリティグループ本体の
         // プロパティに埋め込むため、A の外向きが B を指し B の受け口が A を指すと
         // CloudFormation のリソースとして循環参照になり、変更セットの作成で落ちる
         // （Circular dependency between resources）。別リソースに切り出せば解消する。

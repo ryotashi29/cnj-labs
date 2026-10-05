@@ -56,7 +56,7 @@ public class PinnedWorkload {
      * モニタの代わりに {@link ReentrantLock} を使う。<b>JDK 21 でもキャリアスレッドを掴まない。</b>
      *
      * <p>{@code ReentrantLock} は {@code LockSupport.park} で待つため仮想スレッドがアンマウントされ、
-     * 待っている間キャリアスレッドが空く。{@code synchronized} はモニタを JVM のスタックに結び付けるので
+     * 待っている間はキャリアスレッドを手放す。{@code synchronized} はモニタを JVM のスタックに結び付けるので
      * JDK 23 以前ではアンマウントできない。<b>直し方が「JDK を上げる」だけではないことを示すのが狙い。</b>
      * JDK を選べない現場でも、キャリアスレッドをブロックしない書き方に変えれば症状は消える。
      *

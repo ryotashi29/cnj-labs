@@ -21,7 +21,7 @@ import org.springframework.web.bind.annotation.RestController;
  *
  * <p>仮説 2 は「数の限られたスレッドの本数が上限を決める」であり、WebFlux でのその本数は
  * イベントループスレッド数。{@code reactor.netty.ioWorkerCount} を明示していなければ
- * {@code max(4, availableProcessors())} が既定になるため、設定値と実際に立っている本数の
+ * {@code max(4, availableProcessors())} がデフォルトになるため、設定値と実際に立っている本数の
  * 両方を返す。Fargate の 0.25 vCPU で本当に本数が絞られるのかを、推測ではなく実測で押さえる。
  *
  * <p>プールは 2 つ申告する。{@code db} / {@code bounded} が使う r2dbc-pool と、

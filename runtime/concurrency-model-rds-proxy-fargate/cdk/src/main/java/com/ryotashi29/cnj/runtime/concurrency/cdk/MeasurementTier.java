@@ -142,7 +142,7 @@ public class MeasurementTier extends Construct {
 
     /**
      * アプリ 1 条件ぶんのタスク定義。条件（仮想スレッドの有無・プールサイズ・保持時間）は
-     * {@code RunTask} の {@code containerOverrides} で渡すので、ここでは既定値だけ置く。
+     * {@code RunTask} の {@code containerOverrides} で渡すので、ここではデフォルト値だけ置く。
      */
     private FargateTaskDefinition appTaskDefinition(AppVariant variant, TaskSize size,
             DockerImageAsset image, DatabaseTier database) {

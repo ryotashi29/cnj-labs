@@ -6,7 +6,7 @@ const DEFAULT_LEVELS = [1, 5, 10, 25, 50, 100, 200, 400, 800];
 
 // 段と測定時間は環境変数で絞れる。AWS 上では 1 モードあたり 5〜6 分かかるため、
 // 条件（4 条件 x タスクサイズ 4 段）を広く取るときは段を減らさないと現実的な時間で終わらない。
-// 既定は変えていないので、絞ったときだけ結果に断りが必要になる
+// デフォルトは変えていないので、絞ったときだけ結果に断りが必要になる
 export const LEVELS = (__ENV.LEVELS ? __ENV.LEVELS.split(',') : DEFAULT_LEVELS)
     .map((level) => Number(String(level).trim()))
     .filter((level) => Number.isFinite(level) && level > 0);

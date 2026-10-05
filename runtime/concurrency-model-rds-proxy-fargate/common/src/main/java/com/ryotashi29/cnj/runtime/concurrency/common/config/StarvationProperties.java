@@ -15,7 +15,7 @@ import org.springframework.boot.context.properties.ConfigurationProperties;
  * @param condition              CloudWatch の次元の値。{@code measure-aws.sh} が条件名を渡す
  * @param pinnedThresholdMillis  ピニングを数える下限。これより短いものは害がないので数えない。
  *                               仮想スレッドを使う mvc 側だけが使う値だが、両モジュールで
- *                               既定を揃えておかないと条件間で閾値がずれる
+ *                               デフォルトを揃えておかないと条件間で閾値がずれる
  */
 @ConfigurationProperties(prefix = "starvation")
 public record StarvationProperties(

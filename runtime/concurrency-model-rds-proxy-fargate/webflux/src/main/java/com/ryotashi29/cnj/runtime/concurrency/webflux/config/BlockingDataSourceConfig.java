@@ -13,7 +13,7 @@ import org.springframework.jdbc.core.JdbcTemplate;
  *
  * <p>Spring Boot は <b>{@code ConnectionFactory} Bean があると {@code DataSourceAutoConfiguration} を
  * 意図的に無効化する</b>（{@code @ConditionalOnMissingBean(type = "io.r2dbc.spi.ConnectionFactory")}）。
- * R2DBC を使うアプリが JDBC のプールまで抱えるのを防ぐための親切な既定だが、
+ * R2DBC を使うアプリが JDBC のプールまで抱えるのを防ぐための親切なデフォルトだが、
  * この検証では「R2DBC とブロッキング JDBC を同じ接続数で並べる」ことが目的なので、
  * 自動設定に頼らず自分で組み立てる。
  *

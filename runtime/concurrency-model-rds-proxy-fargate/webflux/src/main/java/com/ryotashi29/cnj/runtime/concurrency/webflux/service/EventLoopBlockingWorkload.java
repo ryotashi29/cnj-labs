@@ -16,9 +16,9 @@ import reactor.core.scheduler.Schedulers;
  *   <caption>ブロックされる「数の限られたスレッド」</caption>
  *   <tr><th>モデル</th><th>ブロックされるもの</th><th>本数</th></tr>
  *   <tr><td>Virtual Thread + synchronized</td><td>キャリアスレッド</td>
- *       <td>{@code jdk.virtualThreadScheduler.parallelism}（既定 = コア数）</td></tr>
+ *       <td>{@code jdk.virtualThreadScheduler.parallelism}（デフォルト = コア数）</td></tr>
  *   <tr><td>WebFlux + ブロッキング JDBC</td><td>イベントループスレッド</td>
- *       <td>{@code reactor.netty.ioWorkerCount}（既定 = max(4, コア数)）</td></tr>
+ *       <td>{@code reactor.netty.ioWorkerCount}（デフォルト = max(4, コア数)）</td></tr>
  * </table>
  *
  * <p>どちらも上限がコア数程度で決まるため、コアの多い開発機では症状が出ず、
@@ -54,7 +54,7 @@ public class EventLoopBlockingWorkload {
     /**
      * {@link #blockEventLoop} の修正版。ブロッキング呼び出しを専用のスレッドプールへ追い出す。
      *
-     * <p>{@code boundedElastic} は既定で {@code コア数 × 10} 本まで伸びる、
+     * <p>{@code boundedElastic} はデフォルトで {@code コア数 × 10} 本まで伸びる、
      * <b>同時実行数のために用意されたスレッド</b>。ここはブロックしてよい。ブロックしてはいけないのは
      * イベントループ（並列実行数のために用意されたスレッド）の側。
      * つまりこの 1 行がやっているのは、<b>ブロックしてよい場所へブロッキングを移すこと</b>。

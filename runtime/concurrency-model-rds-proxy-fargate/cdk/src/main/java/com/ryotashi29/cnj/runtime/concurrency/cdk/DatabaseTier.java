@@ -51,7 +51,7 @@ public class DatabaseTier extends Construct {
     private static final AuroraMysqlEngineVersion AURORA_MYSQL_VERSION = AuroraMysqlEngineVersion.VER_3_08_2;
 
     /**
-     * DB 側の接続上限を明示する。Serverless v2 の既定値は容量から自動で決まるため、
+     * DB 側の接続上限を明示する。Serverless v2 のデフォルト値は容量から自動で決まるため、
      * 「プールサイズが上限を決めている」という仮説が DB 側の上限に汚染されうる。
      * プールは最大でも 25 程度なので、200 を保証しておけば計測の制約にならない。
      */
@@ -140,7 +140,7 @@ public class DatabaseTier extends Construct {
                 .securityGroups(List.of(databaseSecurityGroup))
                 .defaultDatabaseName("vtlab")
                 .credentials(Credentials.fromGeneratedSecret("cnjadmin"))
-                // 保存時の暗号化。既定では付かないので明示する
+                // 保存時の暗号化。デフォルトでは付かないので明示する
                 .storageEncrypted(true)
                 // パスワード認証は Secrets Manager 経由で使い続けるが、
                 // IAM 認証も使える状態にしておく（有効にするだけでは振る舞いは変わらない）

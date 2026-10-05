@@ -85,7 +85,7 @@ public final class EmbeddedMetricsPublisher implements AutoCloseable {
      * 値は数値、次元は英数字に落としてあるのでエスケープの必要がない。
      *
      * <p>{@code StorageResolution} を 1 にしているのは、負荷が 70 秒しかないため。
-     * 既定の 60 秒粒度では山が 1 点に潰れて「CPU は平らだが遅延だけ跳ねる」図が描けない。
+     * デフォルトの 60 秒粒度では山が 1 点に潰れて「CPU は平らだが遅延だけ跳ねる」図が描けない。
      */
     String render(long timestampMillis) {
         StringJoiner definitions = new StringJoiner(",");

@@ -7,7 +7,7 @@
 #
 # 使い方:
 #   ./cdk/scripts/measure-aws.sh verify        # 構成の確認だけ（k6 は流さない）
-#   ./cdk/scripts/measure-aws.sh sweep         # 既定の条件で一巡
+#   ./cdk/scripts/measure-aws.sh sweep         # デフォルトの条件で一巡
 #   SCRIPT=crosstalk CONDITIONS=webflux-blocking ./cdk/scripts/measure-aws.sh sweep
 #   SIZES="cpu256 cpu512 cpu1024 cpu2048" MODES=db ./cdk/scripts/measure-aws.sh sweep
 #   SERVER_PREP_STMTS=true CONDITIONS=mvc-virtual MODES=db ./cdk/scripts/measure-aws.sh sweep
@@ -20,7 +20,7 @@ set -euo pipefail
 
 cd "$(dirname "$0")/../.."
 
-# プロファイルは AWS_PROFILE で渡す。未指定なら AWS CLI の既定（default）
+# プロファイルは AWS_PROFILE で渡す。未指定なら AWS CLI のデフォルト（default）
 PROFILE="${AWS_PROFILE:-default}"
 REGION="${AWS_REGION:-ap-northeast-1}"
 STACK_NAME="${STACK_NAME:-cnj-concurrency-model}"
@@ -130,7 +130,7 @@ fi
 
 # ---------------------------------------------------------------- 条件の対応表
 
-# 条件名から「どのタスク定義か / 追加の環境変数 / 既定のモード / crosstalk の負荷側 /
+# 条件名から「どのタスク定義か / 追加の環境変数 / デフォルトのモード / crosstalk の負荷側 /
 # 枯渇を測るメトリクス名」を引く。ローカルの sweep.sh と同じ責務。対応をここ 1 箇所に
 # 集めておかないと、結果のラベルと実際に測った条件がずれる。
 #
@@ -225,7 +225,7 @@ stop_task() {
     fi
 }
 # 最後まで到達したかどうか。終了コードだけでは足りないため別に持つ。
-# bash 3.2（macOS の既定）は set -u の中断を終了コード 0 で返す。
+# bash 3.2（macOS のデフォルト）は set -u の中断を終了コード 0 で返す。
 # 「$変数 の直後が全角文字」で変数名を取り違えて落ちる事故が実際にあり、
 # そのとき呼び出し側には成功として見えていた
 COMPLETED=false

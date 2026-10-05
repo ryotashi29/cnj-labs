@@ -106,7 +106,7 @@ Connector/J と r2dbc-mysql の両方で確認済みです。
 export AWS_PROFILE=<プロファイル名> AWS_REGION=ap-northeast-1
 aws sts get-caller-identity        # 認証情報の期限切れはここで分かる
 
-# VPC と Internet Gateway の上限（既定は 5）を先に確かめる。
+# VPC と Internet Gateway の上限（デフォルトは 5）を先に確かめる。
 # 埋まっていると VPC の作成で失敗し、全体がロールバックする
 aws ec2 describe-vpcs --query 'length(Vpcs)' --output text
 aws ec2 describe-internet-gateways --query 'length(InternetGateways)' --output text
@@ -116,7 +116,7 @@ cdk bootstrap        # そのアカウント・リージョンで初回だけ
 cdk deploy
 ```
 
-- **`AWS_REGION` を必ず付けてください。** 付け忘れると、既定のリージョンに環境を丸ごと新しく作ろうとします（実際に `cdk diff` で気づきました）。
+- **`AWS_REGION` を必ず付けてください。** 付け忘れると、デフォルトのリージョンに環境を丸ごと新しく作ろうとします（実際に `cdk diff` で気づきました）。
 - CDK も Java 21 でコンパイルします。`cdk.json` が呼ぶ `./cdk-app.sh` が JDK 21 を探します。
 - イメージのビルドがあるので、Docker が動いている必要があります。
 
@@ -133,7 +133,7 @@ cdk deploy
 ## 計測の流し方
 
 **変数とスクリプトは必ず 1 行に書いてください。** zsh では `VAR=値` だけの行はその場の代入で終わり、スクリプトには渡りません。
-スクリプトは既定値で動き出してしまいます。実際に 2 回起き、1 回は 35 分ぶん空回りしました。
+スクリプトはデフォルト値で動き出してしまいます。実際に 2 回起き、1 回は 35 分ぶん空回りしました。
 
 ```bash
 export AWS_REGION=ap-northeast-1

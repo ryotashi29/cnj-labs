@@ -217,7 +217,7 @@ def proxy_series(filename, metric, first):
 
 def claim1_session_pinning():
     runs = [
-        ("useServerPrepStmts=false（既定）", "proxy-pinning-prepoff.jsonl", "2026-09-26T21:14"),
+        ("useServerPrepStmts=false（デフォルト）", "proxy-pinning-prepoff.jsonl", "2026-09-26T21:14"),
         ("useServerPrepStmts=true", "proxy-pinning-prepon.jsonl", "2026-09-27T03:14"),
     ]
     fig, axes = plt.subplots(1, 2, figsize=(12.5, 3.8), sharey=True, gridspec_kw={"wspace": 0.06})

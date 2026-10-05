@@ -23,7 +23,7 @@ import reactor.netty.resources.LoopResources;
  * webflux 側で監視するのは<b>イベントループスレッド</b>。サーバが使っているループ群の
  * 1 本 1 本に何もしないタスクを投げ、走り出すまでの時間の最大値を取る。
  *
- * <p>ループごとに測って最大値を取るのは、{@code reactor.netty.ioWorkerCount} の既定が
+ * <p>ループごとに測って最大値を取るのは、{@code reactor.netty.ioWorkerCount} のデフォルトが
  * {@code max(4, コア数)} で、cpu256 でも 4 本あるため。1 本だけ見ると、
  * たまたまブロックされていないループを引いて枯渇を見逃す。
  *
@@ -38,7 +38,7 @@ public class StarvationMetricsConfig {
     /**
      * サーバのイベントループ群を監視対象にする。
      *
-     * <p>{@link ReactorResourceFactory} があればそこから辿る。Spring Boot は既定で
+     * <p>{@link ReactorResourceFactory} があればそこから辿る。Spring Boot はデフォルトで
      * グローバル資源（{@link HttpResources}）を使うため、Bean が無い構成でも
      * そちらを見れば同じループ群に行き当たる。どちらを引いたかは runnerThread で確認できる。
      */

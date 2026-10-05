@@ -30,13 +30,13 @@ class JdbcUrlsTest {
     }
 
     @Test
-    void 既定値を明示した_URL_は無効と読む() {
+    void デフォルト値を明示した_URL_は無効と読む() {
         assertThat(JdbcUrls.hasServerPrepStmts(
                 BASE + "?sslMode=REQUIRED&useServerPrepStmts=false")).isFalse();
     }
 
     @Test
-    void 指定がなければ_Connector_J_の既定に合わせて無効と読む() {
+    void 指定がなければ_Connector_J_のデフォルトに合わせて無効と読む() {
         assertThat(JdbcUrls.hasServerPrepStmts(BASE + "?sslMode=REQUIRED")).isFalse();
     }
 

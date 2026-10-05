@@ -17,7 +17,7 @@ import reactor.core.publisher.MonoSink;
  * {@code Semaphore} を {@code boundedElastic} に逃がす実装（下記）にはしていない。
  *
  * <p>{@code Semaphore#tryAcquire} を {@code Schedulers.boundedElastic()} に載せる手もあるが、
- * それだと待っている数だけ実スレッドが必要になる。boundedElastic の既定上限は
+ * それだと待っている数だけ実スレッドが必要になる。boundedElastic のデフォルト上限は
  * {@code 10 × コア数} なので、同時 800 の段でスレッド待ちが発生し、測りたいものではなく
  * スケジューラの詰まりを測ってしまう。
  *

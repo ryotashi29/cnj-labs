@@ -68,7 +68,7 @@ public class DiagnosticsController {
 
     /**
      * 仮想スレッドスケジューラの並列度。システムプロパティで明示されていなければ
-     * {@code availableProcessors()} が既定値になるため、両方を並べて返す。
+     * {@code availableProcessors()} がデフォルト値になるため、両方を並べて返す。
      */
     private Map<String, Object> scheduler() {
         Map<String, Object> scheduler = new LinkedHashMap<>();

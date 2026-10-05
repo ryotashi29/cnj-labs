@@ -9,7 +9,7 @@ class WorkloadPropertiesTest {
     private final WorkloadProperties properties = new WorkloadProperties(200, 5000, 64, 10, 0);
 
     @Test
-    void 省略時は既定の保持時間を使う() {
+    void 省略時はデフォルトの保持時間を使う() {
         assertThat(properties.clampHoldMillis(null)).isEqualTo(200);
     }
 

@@ -9,7 +9,7 @@ const BASE_URL = __ENV.BASE_URL || 'http://localhost:8080';
 const MODE = __ENV.MODE || 'db';
 const HOLD_MS = __ENV.HOLD_MS || '200';
 const LABEL = __ENV.LABEL || `${MODE}-hold${HOLD_MS}`;
-// k6 の出力先は k6 プロセスの実行ディレクトリ基準。sweep.sh はプロジェクトルートから起動するため既定はここ
+// k6 の出力先は k6 プロセスの実行ディレクトリ基準。sweep.sh はプロジェクトルートから起動するためデフォルトはここ
 const RESULTS_DIR = __ENV.RESULTS_DIR || 'k6/results';
 // 応答の backendConnectionId を標準出力に残す VU の数。RDS Proxy が Aurora 側の接続を
 // 何本に束ねているかを厳密に数えるため、初出の ID だけを行として出す。
