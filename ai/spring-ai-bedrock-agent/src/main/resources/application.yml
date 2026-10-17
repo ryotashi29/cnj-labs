@@ -1,0 +1,31 @@
+spring:
+  application:
+    name: spring-ai-bedrock-agent
+  ai:
+    bedrock:
+      aws:
+        # 認証情報は AWS SDK のデフォルトの順番（環境変数 → プロファイル → 実行ロール）で探す
+        region: ${AWS_REGION:ap-northeast-1}
+      converse:
+        chat:
+          # Spring AI 2.0 では chat.options.model から chat.model に移った（古い書き方は非推奨。当面は使える）
+          #
+          # 東京リージョンでは新しい Claude を直接呼べないため、日本国内の推論プロファイル（jp.）を使う。
+          # jp. は東京と大阪の間だけで処理を振り分けるので、データが国外に出ない
+          model: ${BEDROCK_MODEL_ID:jp.anthropic.claude-haiku-5-5}
+          max-tokens: 2000
+
+server:
+  port: ${PORT:8080}
+
+app:
+  nominatim:
+    base-url: ${NOMINATIM_BASE_URL:https://nominatim.openstreetmap.org}
+    user-agent: ${NOMINATIM_USER_AGENT:cnj-labs-spring-ai-bedrock-agent/0.1 (https://github.com/ryotashi29/cnj-labs)}
+
+# Spring AI が出すメトリクス（トークン数・応答時間・ツール呼び出し）を見るため
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,metrics

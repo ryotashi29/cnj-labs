@@ -10,7 +10,8 @@
 
 | 検証 | 内容 |
 |---|---|
-| [concurrency-model-rds-proxy-fargate](runtime/concurrency-model-rds-proxy-fargate/) | Java の並行処理モデル（従来のスレッド / 仮想スレッド / WebFlux）で、スループットの上限を決めているものは何か。コネクションプール・DB 内部の同時実行数・少数のスレッド（キャリアスレッドやイベントループ）のブロックを、AWS 上で計測 |
+| [runtime/concurrency-model-rds-proxy-fargate](runtime/concurrency-model-rds-proxy-fargate/) | Java の並行処理モデル（従来のスレッド / 仮想スレッド / WebFlux）で、スループットの上限を決めているものは何か。コネクションプール・DB 内部の同時実行数・数の限られたスレッド（キャリアスレッドやイベントループ）のブロックを、AWS 上で計測 |
+| [ai/spring-ai-bedrock-agent](ai/spring-ai-bedrock-agent/) | Spring AI から Amazon Bedrock を直接呼ぶ AI エージェント。ツール呼び出しとメモリまで作り、本番で運用するには何が足りないかを手元で確かめる |
 
 ## フォルダの構成
 
@@ -19,6 +20,7 @@
 | 技術領域 | 関心事 |
 |---|---|
 | `runtime/` | 実行性能・起動時間・フットプリント・コスト |
+| `ai/` | 生成 AI / AI エージェント |
 
 ## 注意
 
