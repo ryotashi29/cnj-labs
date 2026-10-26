@@ -98,7 +98,7 @@ Spring AI は、Micrometer のメトリクスを自動で出します（`/actuat
 ツールを呼ぶ指示と、ツールの結果は残りません（ツールが呼ばれたことは `spring.ai.tool` のメトリクスで確かめています）。
 
 そのため、続きの質問で LLM が見られるのは、最終の回答に書いた内容だけです。このエージェントで続きの質問でも座標を使えるのは、回答の JSON に座標を入れているからです。
-ツールが返したそれ以外の情報（採らなかった候補など）は、次の質問では見えません。
+ツールが返したそれ以外の情報（採用しなかった候補など）は、次の質問では見えません。
 
 これは Spring AI 2.0 の仕様です（[Upgrade Notes](https://docs.spring.io/spring-ai/reference/upgrade-notes.html) の「Changed: Advisor.DEFAULT_CHAT_MEMORY_PRECEDENCE_ORDER default value」）。メモリの advisor は最終のやり取りだけを保存し、ツールの呼び出しのメッセージは書き込みません。advisor の順番を変えれば、ツールの呼び出しとその結果まで残せると案内されています（試していません）。
 
