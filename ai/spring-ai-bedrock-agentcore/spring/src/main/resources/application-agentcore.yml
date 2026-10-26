@@ -1,0 +1,9 @@
+# AgentCore Runtime の上で使う設定。CDK が SPRING_PROFILES_ACTIVE=agentcore を渡して有効にする。
+# memory-id があると SDK の自動構成が AgentCore Memory を使う（空の値でも有効になって起動に失敗するので、
+# 手元の実行ではこのプロファイルを使わない）
+agentcore:
+  memory:
+    memory-id: ${AGENTCORE_MEMORY_ID}
+    long-term:
+      # Memory に設定した長期の戦略を AWS から読み、advisor を自動で作る
+      auto-discovery: true

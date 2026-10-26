@@ -1,0 +1,11 @@
+{
+  "app": "./gradlew -q run",
+  "watch": {
+    "include": ["src/**"],
+    "exclude": ["build/**", ".gradle/**"]
+  },
+  "context": {
+    "@aws-cdk/core:checkSecretUsage": true,
+    "@aws-cdk/aws-iam:minimizePolicies": true
+  }
+}

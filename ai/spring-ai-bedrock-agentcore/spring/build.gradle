@@ -1,0 +1,56 @@
+plugins {
+    id 'java'
+    id 'org.springframework.boot' version '4.1.1'
+    id 'io.spring.dependency-management' version '1.1.7'
+}
+
+group = 'com.ryotashi29.cnj.ai'
+version = '0.0.1'
+
+java {
+    toolchain {
+        languageVersion = JavaLanguageVersion.of(25)
+    }
+}
+
+repositories {
+    mavenCentral()
+}
+
+ext {
+    set('springAiVersion', '2.0.1')
+    // Spring AI の AgentCore SDK。2.3.0 は Spring Boot 4.1 / Spring AI 2.0.1 が前提
+    set('agentcoreVersion', '2.3.0')
+}
+
+dependencyManagement {
+    imports {
+        mavenBom "org.springframework.ai:spring-ai-bom:${springAiVersion}"
+        mavenBom "org.springaicommunity:spring-ai-agentcore-bom:${agentcoreVersion}"
+    }
+}
+
+dependencies {
+    // AgentCore Runtime の決まった口（POST /invocations と GET /ping）を自動で用意する
+    implementation 'org.springaicommunity:spring-ai-agentcore-runtime-starter'
+    // AgentCore Memory を Spring AI の ChatMemory / advisor として使う
+    implementation 'org.springaicommunity:spring-ai-agentcore-memory'
+    // Spring AI の観測データ（Micrometer の Observation）を OpenTelemetry の span にする。
+    // span は ADOT の Java エージェントが CloudWatch に送る（ObservabilityConfig 参照）
+    implementation 'org.springframework.boot:spring-boot-micrometer-tracing-opentelemetry'
+    implementation 'io.micrometer:micrometer-tracing-bridge-otel'
+    implementation 'org.springframework.ai:spring-ai-starter-model-bedrock-converse'
+    implementation 'org.springframework.boot:spring-boot-starter-web'
+    // /ping を actuator の health と連動させる（なければ常に Healthy を返す）
+    implementation 'org.springframework.boot:spring-boot-starter-actuator'
+    // Gateway（MCP）に接続する。リクエストごとに違うトークンを付けるため、starter ではなく SDK を直接使う。
+    // どの BOM にも入っていないので版を固定する
+    implementation 'io.modelcontextprotocol.sdk:mcp:2.0.1'
+
+    testImplementation 'org.springframework.boot:spring-boot-starter-test'
+    testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
+}
+
+tasks.named('test') {
+    useJUnitPlatform()
+}
