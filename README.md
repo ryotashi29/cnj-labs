@@ -12,6 +12,7 @@
 |---|---|
 | [runtime/concurrency-model-rds-proxy-fargate](runtime/concurrency-model-rds-proxy-fargate/) | Java の並行処理モデル（従来のスレッド / 仮想スレッド / WebFlux）で、スループットの上限を決めているものは何か。コネクションプール・DB 内部の同時実行数・数の限られたスレッド（キャリアスレッドやイベントループ）のブロックを、AWS 上で計測 |
 | [ai/spring-ai-bedrock-agent](ai/spring-ai-bedrock-agent/) | Spring AI から Amazon Bedrock を直接呼ぶ AI エージェント。ツール呼び出しとメモリまで作り、本番で運用するには何が足りないかを手元で確かめる |
+| [ai/spring-ai-bedrock-agentcore](ai/spring-ai-bedrock-agentcore/) | spring-ai-bedrock-agent のエージェントを Amazon Bedrock AgentCore にデプロイし、Spring AI 版と Strands 版で、AgentCore の機能（Runtime・Memory・Identity・Gateway・観測・評価）への対応を比べる |
 
 ## フォルダの構成
 
